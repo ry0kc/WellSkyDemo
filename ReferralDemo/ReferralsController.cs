@@ -1,0 +1,40 @@
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using ReferralDemo.Features.Referrals;
+
+namespace ReferralDemo.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class ReferralsController : ControllerBase
+{
+    // Notice: this controller depends on IMediator, NOT on InMemoryData,
+    // NOT on any handler directly. It has zero idea how any of these
+    // requests actually get fulfilled — that's the whole point.
+    private readonly IMediator _mediator;
+
+    public ReferralsController(IMediator mediator) => _mediator = mediator;
+
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchPatients([FromQuery] string? name, [FromQuery] string? status)
+    {
+        var result = await _mediator.Send(new SearchPatientsQuery { NameContains = name, Status = status });
+        return Ok(result);
+    }
+
+    [HttpGet("{patientId}/status")]
+    public async Task<IActionResult> GetReferralStatus(string patientId)
+    {
+        var result = await _mediator.Send(new GetReferralStatusQuery { PatientId = patientId });
+        if (result is null)
+            return NotFound();
+        return Ok(result);
+    }
+
+    [HttpPost("schedule-visit")]
+    public async Task<IActionResult> ScheduleVisit([FromBody] ScheduleVisitCommand command)
+    {
+        var visitId = await _mediator.Send(command);
+        return Ok(new { visitId });
+    }
+}

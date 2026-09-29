@@ -1,0 +1,35 @@
+name: CI
+
+# Runs automatically on every push to main, and on every pull request
+# targeting main — this is what makes it "continuous" rather than
+# something someone has to remember to trigger.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest # a fresh VM every run — nothing cached from last time
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Restoring the TEST project also restores ReferralDemo itself,
+      # transitively, via the <ProjectReference> in the .csproj — no
+      # separate restore step needed for the main project.
+      - name: Restore dependencies
+        run: dotnet restore ReferralDemo.Tests/ReferralDemo.Tests.csproj
+
+      - name: Build
+        run: dotnet build ReferralDemo.Tests/ReferralDemo.Tests.csproj --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test ReferralDemo.Tests/ReferralDemo.Tests.csproj --no-build --configuration Release --verbosity normal
