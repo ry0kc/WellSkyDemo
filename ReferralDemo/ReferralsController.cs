@@ -8,9 +8,7 @@ namespace ReferralDemo.Controllers;
 [Route("api/[controller]")]
 public class ReferralsController : ControllerBase
 {
-    // Notice: this controller depends on IMediator, NOT on InMemoryData,
-    // NOT on any handler directly. It has zero idea how any of these
-    // requests actually get fulfilled — that's the whole point.
+    // Note: this controller depends on IMediator, NOT on DbContext,
     private readonly IMediator _mediator;
 
     public ReferralsController(IMediator mediator) => _mediator = mediator;
