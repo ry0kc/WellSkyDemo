@@ -1,31 +1,34 @@
-using ReferralDemo.Data;
 using ReferralDemo.Features.Referrals;
 using Xunit;
 
 namespace ReferralDemo.Tests;
 
+[Collection("Postgres")]
 public class GetReferralStatusHandlerTests
 {
+    private readonly PostgresFixture _fixture;
+
+    public GetReferralStatusHandlerTests(PostgresFixture fixture) => _fixture = fixture;
+
     [Fact]
-    public async Task Handle_PatientWithReferral_ReturnsReferralDetails()
+    public async Task Handle_PatientWithReferral_ReturnsReferral()
     {
-        var data = new InMemoryData();
-        var handler = new GetReferralStatusHandler(data);
+        await using var db = _fixture.CreateContext();
+        var handler = new GetReferralStatusHandler(db);
 
         var result = await handler.Handle(new GetReferralStatusQuery { PatientId = "P001" }, default);
 
         Assert.NotNull(result);
-        Assert.Equal("Riverside Home Health", result!.Provider);
+        Assert.Equal("Riverside Home Health", result.Provider);
     }
 
     [Fact]
-    public async Task Handle_PatientWithNoReferralOnFile_ReturnsNull()
+    public async Task Handle_PatientWithoutReferral_ReturnsNull()
     {
-        var data = new InMemoryData();
-        var handler = new GetReferralStatusHandler(data);
+        await using var db = _fixture.CreateContext();
+        var handler = new GetReferralStatusHandler(db);
 
-        // P002 (Robert Smith) is discharged, with no referral in the seed
-        // data — this is the exact case the controller turns into a 404.
+        // P002 is seeded as a patient but has no referral.
         var result = await handler.Handle(new GetReferralStatusQuery { PatientId = "P002" }, default);
 
         Assert.Null(result);

@@ -1,42 +1,52 @@
-using ReferralDemo.Data;
+using Microsoft.EntityFrameworkCore;
 using ReferralDemo.Features.Referrals;
 using Xunit;
 
 namespace ReferralDemo.Tests;
 
+[Collection("Postgres")]
 public class ScheduleVisitHandlerTests
 {
+    private readonly PostgresFixture _fixture;
+
+    public ScheduleVisitHandlerTests(PostgresFixture fixture) => _fixture = fixture;
+
     [Fact]
-    public async Task Handle_ValidCommand_CreatesVisitInDataStore()
+    public async Task Handle_SchedulesVisit_PersistsToDatabase()
     {
-        var data = new InMemoryData();
-        var handler = new ScheduleVisitHandler(data);
-        var command = new ScheduleVisitCommand { PatientId = "P001", VisitDate = DateTime.UtcNow };
+        var visitDate = new DateTime(2026, 10, 15, 14, 0, 0, DateTimeKind.Utc);
 
-        var visitId = await handler.Handle(command, default);
+        Guid id;
+        await using (var db = _fixture.CreateContext())
+        {
+            var handler = new ScheduleVisitHandler(db);
+            id = await handler.Handle(
+                new ScheduleVisitCommand { PatientId = "P001", VisitDate = visitDate }, default);
+        }
 
-        Assert.NotEqual(Guid.Empty, visitId);
-        Assert.Single(data.Visits); // this is the actual side effect, not just the return value
-        Assert.Equal("P001", data.Visits[0].PatientId);
+        // Read back with a fresh context so we're checking the database,
+        // not the first context's in-memory change tracker.
+        await using var verify = _fixture.CreateContext();
+        var saved = await verify.Visits.SingleAsync(v => v.Id == id);
+
+        Assert.Equal("P001", saved.PatientId);
+        Assert.Equal(visitDate, saved.Date);
     }
 
     [Fact]
-    public async Task Handle_CalledTwiceWithSameCommand_CreatesTwoDistinctVisits()
+    public async Task Handle_TwoVisits_ReturnDistinctIds()
     {
-        var data = new InMemoryData();
-        var handler = new ScheduleVisitHandler(data);
-        var command = new ScheduleVisitCommand { PatientId = "P003", VisitDate = DateTime.UtcNow };
+        await using var db = _fixture.CreateContext();
+        var handler = new ScheduleVisitHandler(db);
+        var command = new ScheduleVisitCommand
+        {
+            PatientId = "P003",
+            VisitDate = new DateTime(2026, 10, 20, 9, 0, 0, DateTimeKind.Utc),
+        };
 
-        var firstId = await handler.Handle(command, default);
-        var secondId = await handler.Handle(command, default);
+        var first = await handler.Handle(command, default);
+        var second = await handler.Handle(command, default);
 
-        // Worth noting: this handler is NOT idempotent — calling it twice
-        // creates two visits, not one. That's correct for THIS operation
-        // (scheduling is inherently additive), but it's a good contrast to
-        // point out if asked about idempotency: not every write needs to
-        // be idempotent, only ones where duplicate delivery is possible
-        // and harmful.
-        Assert.NotEqual(firstId, secondId);
-        Assert.Equal(2, data.Visits.Count);
+        Assert.NotEqual(first, second);
     }
 }

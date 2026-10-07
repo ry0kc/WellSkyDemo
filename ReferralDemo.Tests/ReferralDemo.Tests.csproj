@@ -18,7 +18,7 @@
          its dependencies (MediatR, OpenTelemetry, etc.) when you restore
          or build THIS project. You don't need to restore the main project
          separately. -->
-    <ProjectReference Include="..\ReferralDemo\ReferralDemo.csproj" />
+      <ProjectReference Include="..\ReferralDemo\ReferralDemo.csproj" />
   </ItemGroup>
 
 </Project>

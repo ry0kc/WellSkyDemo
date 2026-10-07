@@ -1,50 +1,63 @@
-using ReferralDemo.Data;
+using Microsoft.EntityFrameworkCore;
 using ReferralDemo.Features.Referrals;
 using Xunit;
 
 namespace ReferralDemo.Tests;
 
-// Notice what's NOT here: no mocking framework, no fake database setup.
-// InMemoryData is a plain, concrete class with no external dependencies,
-// so we just instantiate a fresh one per test — real unit isolation
-// without needing Moq for this particular handler.
+// Runs against a real Postgres container. The in-memory provider and SQLite
+// can't execute EF.Functions.ILike, so they would test the wrong thing.
+[Collection("Postgres")]
 public class SearchPatientsHandlerTests
 {
+    private readonly PostgresFixture _fixture;
+
+    public SearchPatientsHandlerTests(PostgresFixture fixture) => _fixture = fixture;
+
     [Fact]
     public async Task Handle_FiltersByNameContains_ReturnsMatchingPatients()
     {
-        var data = new InMemoryData();
-        var handler = new SearchPatientsHandler(data);
+        await using var db = _fixture.CreateContext();
+        var handler = new SearchPatientsHandler(db);
 
         var result = await handler.Handle(new SearchPatientsQuery { NameContains = "Smith" }, default);
 
-        // Alice Smith, Robert Smith, James Smith — 3 of the 4 seeded patients
+        // Alice Smith, Robert Smith, James Smith
         Assert.Equal(3, result.Count);
         Assert.All(result, p => Assert.Contains("Smith", p.Name));
     }
 
     [Fact]
+    public async Task Handle_NameSearchIsCaseInsensitive()
+    {
+        await using var db = _fixture.CreateContext();
+        var handler = new SearchPatientsHandler(db);
+
+        // Postgres is case-sensitive by default; this proves ILIKE is doing its job.
+        var result = await handler.Handle(new SearchPatientsQuery { NameContains = "smith" }, default);
+
+        Assert.Equal(3, result.Count);
+    }
+
+    [Fact]
     public async Task Handle_FiltersByStatus_ReturnsOnlyMatchingStatus()
     {
-        var data = new InMemoryData();
-        var handler = new SearchPatientsHandler(data);
+        await using var db = _fixture.CreateContext();
+        var handler = new SearchPatientsHandler(db);
 
         var result = await handler.Handle(new SearchPatientsQuery { Status = "in_care" }, default);
 
+        Assert.NotEmpty(result);
         Assert.All(result, p => Assert.Equal("in_care", p.Status));
     }
 
     [Fact]
     public async Task Handle_NoFiltersProvided_ReturnsAllPatients()
     {
-        var data = new InMemoryData();
-        var handler = new SearchPatientsHandler(data);
+        await using var db = _fixture.CreateContext();
+        var handler = new SearchPatientsHandler(db);
 
-        // This is the specific behavior we reasoned through earlier: an
-        // empty/null filter should match everything, via the
-        // IsNullOrEmpty(...) || ... short-circuit in the handler.
         var result = await handler.Handle(new SearchPatientsQuery(), default);
 
-        Assert.Equal(data.Patients.Count, result.Count);
+        Assert.Equal(await db.Patients.CountAsync(), result.Count);
     }
 }

@@ -11,6 +11,7 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using ReferralDemo;
 using ReferralDemo.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,7 @@ builder.Services.AddOpenTelemetry()
         .AddAspNetCoreInstrumentation()
         .AddConsoleExporter());
 
+
 // This line scans the current assembly for every class implementing
 // IRequestHandler<,> and registers them all with the DI container
 // automatically — you never manually register GetReferralStatusHandler,
@@ -40,7 +42,9 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Progr
 
 // Singleton = one shared instance for the whole app's lifetime.
 // Fine for this in-memory demo; a real app would use a Scoped DbContext instead.
-builder.Services.AddSingleton<InMemoryData>();
+builder.Services.AddDbContext<ReferralDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Referrals"))
+           .UseSnakeCaseNamingConvention());
 
 var app = builder.Build();
 

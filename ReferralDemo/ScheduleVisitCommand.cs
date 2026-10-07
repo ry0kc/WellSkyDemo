@@ -1,3 +1,4 @@
+
 using MediatR;
 using ReferralDemo.Data;
 using ReferralDemo.Models;
@@ -17,11 +18,11 @@ public class ScheduleVisitCommand : IRequest<Guid>
 
 public class ScheduleVisitHandler : IRequestHandler<ScheduleVisitCommand, Guid>
 {
-    private readonly InMemoryData _data;
+    private readonly ReferralDbContext _db;
 
-    public ScheduleVisitHandler(InMemoryData data) => _data = data;
+    public ScheduleVisitHandler(ReferralDbContext db) => _db = db;
 
-    public Task<Guid> Handle(ScheduleVisitCommand request, CancellationToken ct)
+    public async Task<Guid> Handle(ScheduleVisitCommand request, CancellationToken ct)
     {
         using var activity = Telemetry.ActivitySource.StartActivity("ScheduleVisit");
         activity?.SetTag("patient.id", request.PatientId);
@@ -31,13 +32,14 @@ public class ScheduleVisitHandler : IRequestHandler<ScheduleVisitCommand, Guid>
         {
             Id = Guid.NewGuid(),
             PatientId = request.PatientId,
-            Date = request.VisitDate,
+            // Postgres timestamptz only accepts UTC DateTimes.
+            Date = request.VisitDate.ToUniversalTime(),
         };
 
-        _data.Visits.Add(visit);
+        _db.Visits.Add(visit);
+        await _db.SaveChangesAsync(ct);
 
         activity?.SetTag("visit.id", visit.Id.ToString());
-
-        return Task.FromResult(visit.Id);
+        return visit.Id;
     }
 }
