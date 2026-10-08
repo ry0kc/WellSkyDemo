@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { usePatientStore } from '@/stores/patients'
+import { RouterLink } from 'vue-router'
 
 const store = usePatientStore()
 // storeToRefs keeps these reactive after destructuring.
@@ -37,7 +38,8 @@ onMounted(runSearch)
     <p v-else-if="results.length === 0">No patients found.</p>
     <ul v-else>
       <li v-for="p in results" :key="p.id">
-        {{ p.name }} <small>({{ p.status }})</small>
+        <RouterLink :to="{ name: 'patient', params: { id: p.id } }">{{ p.name }}</RouterLink>
+        <small>({{ p.status }})</small>
       </li>
     </ul>
   </main>
