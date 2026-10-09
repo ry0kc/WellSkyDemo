@@ -260,3 +260,4 @@ C:\ReferralDemo-repo\ReferralDemo.Tests\obj\Debug\net8.0\ReferralDemo.Tests.genr
 C:\ReferralDemo-repo\ReferralDemo.Tests\obj\Debug\net8.0\ref\ReferralDemo.Tests.dll
 C:\ReferralDemo-repo\ReferralDemo.Tests\bin\Debug\net8.0\ReferralDemo.Rules.dll
 C:\ReferralDemo-repo\ReferralDemo.Tests\bin\Debug\net8.0\ReferralDemo.Rules.pdb
+C:\ReferralDemo-repo\ReferralDemo.Tests\bin\Debug\net8.0\Microsoft.Extensions.TimeProvider.Testing.dll

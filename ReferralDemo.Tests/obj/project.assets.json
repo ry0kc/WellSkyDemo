@@ -591,6 +591,22 @@
           "buildTransitive/net6.0/_._": {}
         }
       },
+      "Microsoft.Extensions.TimeProvider.Testing/8.10.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Microsoft.Extensions.TimeProvider.Testing.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.Extensions.TimeProvider.Testing.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/net6.0/_._": {}
+        }
+      },
       "Microsoft.NET.Test.Sdk/17.11.1": {
         "type": "package",
         "dependencies": {
@@ -1345,6 +1361,9 @@
       "ReferralDemo.Rules/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "MediatR": "12.0.0"
+        },
         "compile": {
           "bin/placeholder/ReferralDemo.Rules.dll": {}
         },
@@ -2343,6 +2362,27 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "Microsoft.Extensions.TimeProvider.Testing/8.10.0": {
+      "sha512": "PqISLycRh3Ym1xBNcmc8OMuqpik0wXkR2uPh8HstyYNXmH06l09hkBaDnRCPo6zBekhaHiGX91Lhbks8nVSZKg==",
+      "type": "package",
+      "path": "microsoft.extensions.timeprovider.testing/8.10.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "README.md",
+        "buildTransitive/net462/Microsoft.Extensions.TimeProvider.Testing.targets",
+        "buildTransitive/net6.0/_._",
+        "lib/net462/Microsoft.Extensions.TimeProvider.Testing.dll",
+        "lib/net462/Microsoft.Extensions.TimeProvider.Testing.xml",
+        "lib/net6.0/Microsoft.Extensions.TimeProvider.Testing.dll",
+        "lib/net6.0/Microsoft.Extensions.TimeProvider.Testing.xml",
+        "lib/net8.0/Microsoft.Extensions.TimeProvider.Testing.dll",
+        "lib/net8.0/Microsoft.Extensions.TimeProvider.Testing.xml",
+        "microsoft.extensions.timeprovider.testing.8.10.0.nupkg.sha512",
+        "microsoft.extensions.timeprovider.testing.nuspec"
+      ]
+    },
     "Microsoft.NET.Test.Sdk/17.11.1": {
       "sha512": "U3Ty4BaGoEu+T2bwSko9tWqWUOU16WzSFkq6U8zve75oRBMSLTBdMAZrVNNz1Tq12aCdDom9fcOcM9QZaFHqFg==",
       "type": "package",
@@ -3228,6 +3268,7 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "Microsoft.Extensions.TimeProvider.Testing >= 8.*",
       "Microsoft.NET.Test.Sdk >= 17.11.1",
       "ReferralDemo >= 1.0.0",
       "xunit >= 2.9.2",
@@ -3280,6 +3321,10 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "Microsoft.Extensions.TimeProvider.Testing": {
+            "target": "Package",
+            "version": "[8.*, )"
+          },
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",
             "version": "[17.11.1, )"

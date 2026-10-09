@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { RouterLink } from 'vue-router'
-import { getReferralStatus, scheduleVisit } from '@/api'
-import type { Referral } from '@/types'
+import { getReferralSummary, scheduleVisit } from '@/api'
+import type { ReferralSummary } from '@/types'
 
 // The router passes the :id route param in as a prop.
 const props = defineProps<{ id: string }>()
 
 // Page-only state stays local; Pinia is for state shared across views.
-const referral = ref<Referral | null>(null)
+const referral = ref<ReferralSummary | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 
@@ -16,11 +16,27 @@ const visitDate = ref('')
 const saving = ref(false)
 const confirmation = ref<string | null>(null)
 
+const urgencyLabel: Record<ReferralSummary['urgency'], string> = {
+  overdue: 'Overdue',
+  due_soon: 'Due soon',
+  on_track: 'On track',
+  no_due_date: 'No due date',
+}
+
+// Recalculates only when referral changes; cached otherwise.
+const dueText = computed(() => {
+  const d = referral.value?.daysUntilDue
+  if (d == null) return ''
+  if (d < 0) return `${-d} day${d === -1 ? '' : 's'} overdue`
+  if (d === 0) return 'due today'
+  return `due in ${d} day${d === 1 ? '' : 's'}`
+})
+
 async function load() {
   loading.value = true
   error.value = null
   try {
-    referral.value = await getReferralStatus(props.id)
+    referral.value = await getReferralSummary(props.id)
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Lookup failed'
   } finally {
@@ -61,7 +77,12 @@ async function submitVisit() {
       <h2>Referral</h2>
       <p><strong>Provider:</strong> {{ referral.provider }}</p>
       <p><strong>Next step:</strong> {{ referral.nextStep }}</p>
-      <p><strong>Due:</strong> {{ new Date(referral.dueDate).toLocaleDateString() }}</p>
+      <p>
+        <strong>Due:</strong>
+        {{ referral.dueDate ? new Date(referral.dueDate).toLocaleDateString() : 'Not set' }}
+        <span v-if="dueText">({{ dueText }})</span>
+        <span :class="['badge', referral.urgency]">{{ urgencyLabel[referral.urgency] }}</span>
+      </p>
     </section>
     <p v-else>No referral on file.</p>
 
@@ -73,3 +94,11 @@ async function submitVisit() {
     <p v-if="confirmation">{{ confirmation }}</p>
   </main>
 </template>
+
+<style scoped>
+.badge { margin-left: 0.5rem; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.85em; }
+.overdue { background: #fde2e1; color: #9b1c1c; }
+.due_soon { background: #fef3c7; color: #92400e; }
+.on_track { background: #dcfce7; color: #166534; }
+.no_due_date { background: #e5e7eb; color: #374151; }
+</style>

@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v8.0": {
       "ReferralDemo.Tests/1.0.0": {
         "dependencies": {
+          "Microsoft.Extensions.TimeProvider.Testing": "8.10.0",
           "Microsoft.NET.Test.Sdk": "17.11.1",
           "ReferralDemo": "1.0.0",
           "xunit": "2.9.2",
@@ -323,6 +324,14 @@
         }
       },
       "Microsoft.Extensions.Primitives/8.0.0": {},
+      "Microsoft.Extensions.TimeProvider.Testing/8.10.0": {
+        "runtime": {
+          "lib/net8.0/Microsoft.Extensions.TimeProvider.Testing.dll": {
+            "assemblyVersion": "8.10.0.0",
+            "fileVersion": "8.1000.24.50207"
+          }
+        }
+      },
       "Microsoft.NET.Test.Sdk/17.11.1": {
         "dependencies": {
           "Microsoft.CodeCoverage": "17.11.1",
@@ -852,6 +861,9 @@
         }
       },
       "ReferralDemo.Rules/1.0.0": {
+        "dependencies": {
+          "MediatR": "12.5.0"
+        },
         "runtime": {
           "ReferralDemo.Rules.dll": {
             "assemblyVersion": "1.0.0",
@@ -1097,6 +1109,13 @@
       "sha512": "sha512-bXJEZrW9ny8vjMF1JV253WeLhpEVzFo1lyaZu1vQ4ZxWUlVvknZ/+ftFgVheLubb4eZPSwwxBeqS1JkCOjxd8g==",
       "path": "microsoft.extensions.primitives/8.0.0",
       "hashPath": "microsoft.extensions.primitives.8.0.0.nupkg.sha512"
+    },
+    "Microsoft.Extensions.TimeProvider.Testing/8.10.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-PqISLycRh3Ym1xBNcmc8OMuqpik0wXkR2uPh8HstyYNXmH06l09hkBaDnRCPo6zBekhaHiGX91Lhbks8nVSZKg==",
+      "path": "microsoft.extensions.timeprovider.testing/8.10.0",
+      "hashPath": "microsoft.extensions.timeprovider.testing.8.10.0.nupkg.sha512"
     },
     "Microsoft.NET.Test.Sdk/17.11.1": {
       "type": "package",

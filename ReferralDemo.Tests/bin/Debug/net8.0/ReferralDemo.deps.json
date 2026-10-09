@@ -873,6 +873,9 @@
         }
       },
       "ReferralDemo.Rules/1.0.0": {
+        "dependencies": {
+          "MediatR": "12.5.0"
+        },
         "runtime": {
           "ReferralDemo.Rules.dll": {
             "assemblyVersion": "1.0.0",

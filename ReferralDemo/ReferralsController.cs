@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using ReferralDemo.Features.Referrals;
+using ReferralDemo.Rules;
 
 namespace ReferralDemo.Controllers;
 
@@ -35,4 +36,11 @@ public class ReferralsController : ControllerBase
         var visitId = await _mediator.Send(command);
         return Ok(new { visitId });
     }
+
+    [HttpGet("{patientId}/summary")]
+    public async Task<IActionResult> GetReferralSummary(string patientId)
+    {
+        var result = await _mediator.Send(new GetReferralSummaryQuery { PatientId = patientId });
+        return result is null ? NotFound() : Ok(result);
+    }   
 }

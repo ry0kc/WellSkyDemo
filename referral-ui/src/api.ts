@@ -1,4 +1,5 @@
 import type { Patient, Referral } from './types'
+import type { ReferralSummary } from './types'  
 
 export async function searchPatients(name: string, status: string): Promise<Patient[]> {
   const params = new URLSearchParams()
@@ -26,4 +27,11 @@ export async function scheduleVisit(patientId: string, visitDate: string): Promi
   if (!res.ok) throw new Error(`Scheduling failed (${res.status})`)
   const data: { visitId: string } = await res.json()
   return data.visitId
+}
+
+export async function getReferralSummary(patientId: string): Promise<ReferralSummary | null> {
+  const res = await fetch(`/api/referrals/${encodeURIComponent(patientId)}/summary`)
+  if (res.status === 404) return null
+  if (!res.ok) throw new Error(`Lookup failed (${res.status})`)
+  return res.json()
 }

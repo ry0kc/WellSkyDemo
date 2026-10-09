@@ -38,7 +38,12 @@ builder.Services.AddOpenTelemetry()
 // IRequestHandler<,> and registers them all with the DI container
 // automatically — you never manually register GetReferralStatusHandler,
 // ScheduleVisitHandler, etc. one by one.
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
+    typeof(Program).Assembly,
+    typeof(ReferralDemo.Rules.GetReferralSummaryHandler).Assembly));
+
+builder.Services.AddScoped<ReferralDemo.Rules.IReferralReader, EfReferralReader>();
+builder.Services.AddSingleton(TimeProvider.System);
 
 // Singleton = one shared instance for the whole app's lifetime.
 // Fine for this in-memory demo; a real app would use a Scoped DbContext instead.
