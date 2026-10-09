@@ -10,6 +10,20 @@ on:
     branches: [main]
 
 jobs:
+  frontend:
+    runs-on: ubuntu-latest
+      defaults:
+        run:
+          working-directory: referral-ui
+      steps:
+        - uses: actions/checkout@v4
+        - uses: actions/setup-node@v4
+          with:
+            node-version: 22
+            cache: npm
+            cache-dependency-path: referral-ui/package-lock.json
+        - run: npm ci
+        - run: npm run build
   build-and-test:
     runs-on: ubuntu-latest # a fresh VM every run — nothing cached from last time
 

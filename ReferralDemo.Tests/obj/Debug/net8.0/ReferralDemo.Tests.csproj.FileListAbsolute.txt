@@ -258,3 +258,5 @@ C:\ReferralDemo-repo\ReferralDemo.Tests\obj\Debug\net8.0\refint\ReferralDemo.Tes
 C:\ReferralDemo-repo\ReferralDemo.Tests\obj\Debug\net8.0\ReferralDemo.Tests.pdb
 C:\ReferralDemo-repo\ReferralDemo.Tests\obj\Debug\net8.0\ReferralDemo.Tests.genruntimeconfig.cache
 C:\ReferralDemo-repo\ReferralDemo.Tests\obj\Debug\net8.0\ref\ReferralDemo.Tests.dll
+C:\ReferralDemo-repo\ReferralDemo.Tests\bin\Debug\net8.0\ReferralDemo.Rules.dll
+C:\ReferralDemo-repo\ReferralDemo.Tests\bin\Debug\net8.0\ReferralDemo.Rules.pdb

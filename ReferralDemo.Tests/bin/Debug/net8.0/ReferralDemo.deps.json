@@ -17,6 +17,7 @@
           "OpenTelemetry.Exporter.Console": "1.9.0",
           "OpenTelemetry.Extensions.Hosting": "1.9.0",
           "OpenTelemetry.Instrumentation.AspNetCore": "1.9.0",
+          "ReferralDemo.Rules": "1.0.0",
           "Swashbuckle.AspNetCore": "10.2.3",
           "Testcontainers.PostgreSql": "4.15.0"
         },
@@ -870,6 +871,14 @@
             "fileVersion": "4.15.0.0"
           }
         }
+      },
+      "ReferralDemo.Rules/1.0.0": {
+        "runtime": {
+          "ReferralDemo.Rules.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
       }
     }
   },
@@ -1396,6 +1405,11 @@
       "sha512": "sha512-45ZvqAzrh9BoI15Z4id7WEfhk1pVKqVeAX76aef8fR5ScglD75fSQtYuXhKFx4kIcgRL5aLKt3pRiqCVIgsL9g==",
       "path": "testcontainers.postgresql/4.15.0",
       "hashPath": "testcontainers.postgresql.4.15.0.nupkg.sha512"
+    },
+    "ReferralDemo.Rules/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

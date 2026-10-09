@@ -24,4 +24,8 @@
     <PackageReference Include="Testcontainers.PostgreSql" Version="4.15.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ReferralDemo.Rules\ReferralDemo.Rules.vbproj" />
+  </ItemGroup>
+
 </Project>
