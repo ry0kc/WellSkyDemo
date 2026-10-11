@@ -66,7 +66,7 @@ Now hit `GET /api/referrals/search?name=Smith` (via Swagger or curl).
 Alongside the normal request logs, you'll see a block of span output printed
 to the console — look for two nested entries for that one request:
 
-- One span for the incoming HTTP request itself (created automatically by
+- One span for the incoming HTTP request itself created automatically by
   `AddAspNetCoreInstrumentation()` 
 - A child span called `SearchPatients`,
   carrying tags like `search.name_contains: Smith` and
