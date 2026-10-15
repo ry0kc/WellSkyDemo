@@ -1,5 +1,7 @@
 
+using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using ReferralDemo.Data;
 using ReferralDemo.Models;
 using ReferralDemo;
@@ -14,6 +16,27 @@ public class ScheduleVisitCommand : IRequest<Guid>
 {
     public string PatientId { get; set; } = string.Empty;
     public DateTime VisitDate { get; set; }
+}
+
+public class ScheduleVisitCommandValidator : AbstractValidator<ScheduleVisitCommand>
+{
+    public ScheduleVisitCommandValidator(ReferralDbContext db, TimeProvider clock)
+    {
+        // Stop at the first failure so the database is only queried
+        // for a well-formed patient ID.
+        RuleFor(c => c.PatientId)
+            .Cascade(CascadeMode.Stop)
+            .NotEmpty()
+            .MaximumLength(50)
+            .MustAsync((id, ct) => db.Patients.AnyAsync(p => p.Id == id, ct))
+            .WithMessage("Patient '{PropertyValue}' not found.");
+
+        RuleFor(c => c.VisitDate)
+            .Cascade(CascadeMode.Stop)
+            .NotEqual(default(DateTime)).WithMessage("Visit date is required.")
+            .Must(d => d.ToUniversalTime() >= clock.GetUtcNow().UtcDateTime)
+            .WithMessage("Visit date cannot be in the past.");
+    }
 }
 
 public class ScheduleVisitHandler : IRequestHandler<ScheduleVisitCommand, Guid>

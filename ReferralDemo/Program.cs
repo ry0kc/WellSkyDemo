@@ -6,6 +6,7 @@
 // based on the request type — same reflection-based discovery
 // mechanism we talked through conceptually.
 
+using FluentValidation;
 using MediatR;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -38,9 +39,23 @@ builder.Services.AddOpenTelemetry()
 // IRequestHandler<,> and registers them all with the DI container
 // automatically — you never manually register GetReferralStatusHandler,
 // ScheduleVisitHandler, etc. one by one.
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
-    typeof(Program).Assembly,
-    typeof(ReferralDemo.Rules.GetReferralSummaryHandler).Assembly));
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssemblies(
+        typeof(Program).Assembly,
+        typeof(ReferralDemo.Rules.GetReferralSummaryHandler).Assembly);
+
+    // Every request passes through validation before its handler runs.
+    cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+});
+
+// Finds every AbstractValidator<T> in this assembly; registered as scoped
+// so validators can use the scoped DbContext.
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+// Validation failures become 400 ValidationProblemDetails responses.
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<ValidationExceptionHandler>();
 
 builder.Services.AddScoped<ReferralDemo.Rules.IReferralReader, EfReferralReader>();
 builder.Services.AddSingleton(TimeProvider.System);
@@ -53,6 +68,8 @@ builder.Services.AddDbContext<ReferralDbContext>(options =>
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -61,3 +78,7 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 app.Run();
+
+// Top-level statements generate an internal Program class; this makes it
+// public so WebApplicationFactory<Program> in the test project can use it.
+public partial class Program { }

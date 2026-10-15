@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using MediatR;
 using ReferralDemo.Data;
@@ -12,6 +13,19 @@ public class SearchPatientsQuery : IRequest<List<Patient>>
 {
     public string? NameContains { get; set; }
     public string? Status { get; set; }
+}
+
+public class SearchPatientsQueryValidator : AbstractValidator<SearchPatientsQuery>
+{
+    public SearchPatientsQueryValidator()
+    {
+        RuleFor(q => q.NameContains).MaximumLength(100);
+
+        RuleFor(q => q.Status)
+            .Must(s => Patient.Statuses.Contains(s))
+            .When(q => !string.IsNullOrEmpty(q.Status))
+            .WithMessage($"Status must be one of: {string.Join(", ", Patient.Statuses)}.");
+    }
 }
 
 public class SearchPatientsHandler : IRequestHandler<SearchPatientsQuery, List<Patient>>

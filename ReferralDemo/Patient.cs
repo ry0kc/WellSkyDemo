@@ -8,4 +8,6 @@ public class Patient
     // "in_care", "discharged", "pending_admission" — same statuses
     // as the fake data in the agent demo, kept consistent on purpose.
     public string Status { get; set; } = string.Empty;
+
+    public static readonly string[] Statuses = ["in_care", "discharged", "pending_admission"];
 }

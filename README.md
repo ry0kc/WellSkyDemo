@@ -28,7 +28,7 @@ flowchart LR
     D --> E[(PostgreSQL)]
 ```
 
-Controllers stay thin and send each request through MediatR. Each handler is one use case with its own OpenTelemetry span. Reads skip change tracking; the write commits through `SaveChangesAsync`. The request's `CancellationToken` flows from the controller through MediatR to EF Core, so an abandoned request stops its database query.
+Controllers stay thin and send each request through MediatR. A validation pipeline behavior runs the request's FluentValidation validators first; failures come back as a 400 with a `ValidationProblemDetails` body listing the errors per field. Each handler is one use case with its own OpenTelemetry span. Reads skip change tracking; the write commits through `SaveChangesAsync`. The request's `CancellationToken` flows from the controller through MediatR to EF Core, so an abandoned request stops its database query.
 
 ## Projects
 
@@ -117,8 +117,7 @@ The connection string comes from an environment variable, the same way a secret 
 
 ## What I'd add next
 
-- Request validation as a MediatR pipeline behavior (FluentValidation), with failures returned as 400 responses
-- A check that the patient exists, and a foreign key from visits to patients
+- A foreign key from visits to patients
 - EF Core instrumentation so SQL queries appear as spans
 - Docker Compose for the full stack, and a deployment to Cloud Run with Cloud SQL
 
