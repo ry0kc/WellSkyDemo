@@ -45,8 +45,8 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(
 builder.Services.AddScoped<ReferralDemo.Rules.IReferralReader, EfReferralReader>();
 builder.Services.AddSingleton(TimeProvider.System);
 
-// Singleton = one shared instance for the whole app's lifetime.
-// Fine for this in-memory demo; a real app would use a Scoped DbContext instead.
+// Scoped (the AddDbContext default): one DbContext per HTTP request, backed by
+// PostgreSQL. Snake_case naming maps C# properties to Postgres identifiers.
 builder.Services.AddDbContext<ReferralDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Referrals"))
            .UseSnakeCaseNamingConvention());
