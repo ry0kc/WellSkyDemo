@@ -15,6 +15,7 @@ const error = ref<string | null>(null)
 const visitDate = ref('')
 const saving = ref(false)
 const confirmation = ref<string | null>(null)
+const scheduleError = ref<string | null>(null)
 
 const urgencyLabel: Record<ReferralSummary['urgency'], string> = {
   overdue: 'Overdue',
@@ -51,7 +52,7 @@ async function submitVisit() {
   if (!visitDate.value) return
   saving.value = true
   confirmation.value = null
-  error.value = null
+  scheduleError.value = null
   try {
     // datetime-local has no time zone; toISOString converts it to UTC,
     // which is what the API and Postgres timestamptz expect.
@@ -59,7 +60,7 @@ async function submitVisit() {
     confirmation.value = `Visit scheduled (ID ${id})`
     visitDate.value = ''
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Scheduling failed'
+    scheduleError.value = e instanceof Error ? e.message : 'Scheduling failed'
   } finally {
     saving.value = false
   }
@@ -92,6 +93,7 @@ async function submitVisit() {
       <button type="submit" :disabled="saving">Schedule</button>
     </form>
     <p v-if="confirmation">{{ confirmation }}</p>
+    <p v-if="scheduleError" role="alert">{{ scheduleError }}</p>
   </main>
 </template>
 
